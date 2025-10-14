@@ -1,7 +1,201 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 body {
-  font-family: "Inter", sans-serif;
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #f9f9ff, #e3f2fd);
+  color: #222;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(90deg, #1976d2, #42a5f5);
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  letter-spacing: 1px;
+}
+
+header p {
+  margin-top: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+}
+
+.sidebar {
+  width: 220px;
+  background: white;
+  border-right: 2px solid #e3f2fd;
+  padding: 1rem;
+}
+
+.sidebar h2 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.sidebar button {
+  display: block;
+  width: 100%;
+  background: #f5f5f5;
+  border: none;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: 500;
+}
+
+.sidebar button.active,
+.sidebar button:hover {
+  background: #1976d2;
+  color: white;
+}
+
+.content {
+  flex: 1;
+  padding: 2rem;
+}
+
+.search-box {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.search-box input {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #1976d2;
+  border-radius: 6px;
+  outline: none;
+}
+
+.search-box button {
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.search-box button:hover {
+  background: #1565c0;
+}
+
+.result-card {
+  background: white;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.result-card a {
+  color: #1976d2;
+  text-decoration: none;
+}
+
+.cite-buttons {
+  margin-top: 0.5rem;
+}
+
+.cite-buttons button {
+  background: #e3f2fd;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  margin-right: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.cite-buttons button:hover {
+  background: #bbdefb;
+}
+
+.latest .highlight {
+  background: white;
+  border-left: 4px solid #1976d2;
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 6px;
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+  background: #1976d2;
+  color: white;
+}
+.papers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.2rem;
+  margin-top: 1rem;
+}
+
+.paper-card {
+  background: #ffffff10;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.paper-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.view-btn {
+  background: linear-gradient(to right, #4f46e5, #9333ea);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.4rem 1rem;
+  margin-top: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.3s ease;
+}.research-buttons {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.research-buttons button {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.research-buttons button:hover {
+  background-color: #1e40af;
+}
+
+
+.view-btn:hover {
+  background: linear-gradient(to right, #6366f1, #a855f7);
 }

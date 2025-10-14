@@ -1,174 +1,185 @@
 import React, { useState } from "react";
+import "./index.css";
 
-export default function App() {
+const App = () => {
   const [query, setQuery] = useState("");
+  const [selectedField, setSelectedField] = useState("All");
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedField, setSelectedField] = useState("All");
+  const [error, setError] = useState("");
+
+  const fields = [
+    "All",
+    "Hematology",
+    "Parasitology",
+    "Biochemistry",
+    "Microbiology",
+    "Serology",
+  ];
+
+  const latestResearch = [
+    {
+      title: "AI-driven hematology analysis improves diagnostic accuracy",
+      source: "Hematology Reports • 2024",
+    },
+    {
+      title: "New malaria detection biomarkers identified",
+      source: "Parasitology Today • 2023",
+    },
+    {
+      title: "Advances in clinical biochemistry for sepsis detection",
+      source: "Clinical Biochem Journal • 2025",
+    },
+  ];
 
   const handleSearch = async () => {
-    if (!query.trim()) return alert("Please enter a search term.");
-    setLoading(true);
-
-    try {
-      const response = await fetch(
-        `https://serpapi.com/search.json?engine=google_scholar&q=${encodeURIComponent(
-          query
-        )}&api_key=demo`
-      );
-      const data = await response.json();
-      setResults(data.organic_results || []);
-    } catch (error) {
-      console.error(error);
-      alert("Search failed. Check your internet connection.");
+    if (!query.trim()) {
+      alert("Please enter a search term");
+      return;
     }
 
-    setLoading(false);
+    setLoading(true);
+    setError("");
+    setResults([]);
+
+    try {
+      const fieldQuery = selectedField !== "All" ? selectedField : "";
+      // ✅ Call your local backend server (proxy)
+      const response = await fetch(
+        `http://localhost:5000/api/search?q=${encodeURIComponent(
+          query + " " + fieldQuery
+        )}`
+      );
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      if (data.organic_results && data.organic_results.length > 0) {
+        setResults(data.organic_results);
+      } else {
+        setError("No results found.");
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError("Search failed. Check your connection or backend server.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Press Enter to search
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") handleSearch();
   };
 
-  // Export results to EndNote format (.ris)
-  const handleExportEndNote = () => {
-    if (results.length === 0) return alert("No results to export.");
-
-    const ris = results
-      .map(
-        (r) =>
-          `TY  - JOUR\nTI  - ${r.title || "No title"}\nAU  - ${
-            r.publication_info?.authors?.map((a: any) => a.name).join("; ") ||
-            "Unknown"
-          }\nPY  - ${r.publication_info?.year || "n.d."}\nUR  - ${
-            r.link || ""
-          }\nER  - `
-      )
-      .join("\n\n");
-
-    const blob = new Blob([ris], { type: "application/x-research-info-systems" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "fondo_research_results.ris";
-    a.click();
-  };
-
   return (
-    <div style={{ display: "flex", height: "100vh", fontFamily: "Arial" }}>
-      {/* Sidebar */}
-      <div
-        style={{
-          width: "220px",
-          background: "#1e3a8a",
-          color: "white",
-          padding: "20px",
-        }}
-      >
-        <h2 style={{ fontSize: "20px", marginBottom: "15px" }}>Categories</h2>
-        {["All", "Hematology", "Serology", "Biochemistry", "Microbiology", "Parasitology"].map(
-          (field) => (
-            <div
-              key={field}
-              onClick={() => setSelectedField(field)}
-              style={{
-                background:
-                  selectedField === field ? "rgba(255,255,255,0.2)" : "transparent",
-                padding: "10px",
-                borderRadius: "8px",
-                cursor: "pointer",
-                marginBottom: "10px",
-              }}
+    <div className="app-container">
+      <header>
+        <h1>PRECIOSO’S RESEARCH AREA</h1>
+        <p>Explore trusted Medical Laboratory Science research papers.</p>
+      </header>
+
+      <div className="main-content">
+        <aside className="sidebar">
+          <h2>Fields</h2>
+          {fields.map((f) => (
+            <button
+              key={f}
+              onClick={() => setSelectedField(f)}
+              className={selectedField === f ? "active" : ""}
             >
-              {field}
-            </div>
-          )
-        )}
-      </div>
+              {f}
+            </button>
+          ))}
+        </aside>
 
-      {/* Main Content */}
-      <div style={{ flex: 1, padding: "30px" }}>
-        <h1 style={{ color: "#2563eb", marginBottom: "10px" }}>
-          FONDOH RESEARCH AREA
-        </h1>
-        <p>Search trusted journals and scholarly databases.</p>
+        <section className="content">
+          <div className="search-box">
+            <input
+              type="text"
+              placeholder="Search topics, e.g. malaria biomarkers"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+            <button onClick={handleSearch}>Search</button>
+          </div>
 
-        {/* Search Box */}
-        <div style={{ marginTop: "20px", marginBottom: "20px" }}>
-          <input
-            type="text"
-            placeholder={`Search ${selectedField} topics...`}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
-            style={{
-              padding: "10px",
-              width: "60%",
-              borderRadius: "8px",
-              border: "1px solid #ccc",
-            }}
-          />
-          <button
-            onClick={handleSearch}
-            style={{
-              marginLeft: "10px",
-              padding: "10px 20px",
-              background: "#2563eb",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer",
-            }}
-          >
-            Search
-          </button>
+          <div className="results">
+            <h2>Search Results</h2>
 
-          <button
-            onClick={handleExportEndNote}
-            style={{
-              marginLeft: "10px",
-              padding: "10px 20px",
-              background: "#22c55e",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer",
-            }}
-          >
-            Export to EndNote
-          </button>
-        </div>
+            {loading && <p>Loading...</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>}
 
-        {/* Results */}
-        {loading ? (
-          <p>Loading...</p>
-        ) : results.length > 0 ? (
-          <div>
-            {results.map((item, idx) => (
-              <div
-                key={idx}
-                style={{
-                  border: "1px solid #ddd",
-                  padding: "15px",
-                  borderRadius: "8px",
-                  marginBottom: "10px",
-                }}
-              >
-                <h3>{item.title}</h3>
-                <p>{item.snippet}</p>
-                {item.link && (
-                  <a href={item.link} target="_blank" rel="noreferrer">
-                    View on Google Scholar
-                  </a>
+            {!loading && !error && results.length === 0 && (
+              <p>No results yet. Try searching something above.</p>
+            )}
+
+            {results.map((r, i) => (
+              <div key={i} className="result-card">
+                <a href={r.link} target="_blank" rel="noopener noreferrer">
+                  <h3>{r.title}</h3>
+                </a>
+                {r.publication_info && (
+                  <p>{r.publication_info.summary}</p>
                 )}
+                <div className="cite-buttons">
+                  <button>Cite in EndNote</button>
+                  <button>Cite in Mendeley</button>
+                  <button>Cite in Zotero</button>
+                </div>
               </div>
             ))}
           </div>
-        ) : (
-          <p>No results yet. Try searching.</p>
-        )}
+
+          <div className="latest">
+            <h2>Latest Research Highlights</h2>
+            {latestResearch.map((item, idx) => (
+              <div key={idx} className="highlight">
+                <h4>{item.title}</h4>
+                <p>{item.source}</p>
+                <div className="research-buttons">
+                  <a
+                    href={`https://scholar.google.com/scholar?q=${encodeURIComponent(
+                      item.title
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <button>View on Google Scholar</button>
+                  </a>
+                  <a
+                    href={`https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(
+                      item.title
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <button>View on PubMed</button>
+                  </a>
+                  <a
+                    href={`https://www.sciencedirect.com/search?qs=${encodeURIComponent(
+                      item.title
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <button>View on ScienceDirect</button>
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
+
+      <footer>
+        © 2025 PRECIOSO’S RESEARCH AREA — Built with React + Vite
+      </footer>
     </div>
   );
-}
+};
+
+export default App;
