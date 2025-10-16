@@ -44,12 +44,23 @@ const App = () => {
 
     try {
       const fieldQuery = selectedField !== "All" ? selectedField : "";
-      // ✅ Call your local backend server (proxy)
+
+      // ✅ Connect to your Express backend
       const response = await fetch(
         `http://localhost:5000/api/search?q=${encodeURIComponent(
           query + " " + fieldQuery
-        )}`
+        )}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
+
+      if (!response.ok) {
+        throw new Error("Backend not responding properly.");
+      }
 
       const data = await response.json();
 
@@ -63,8 +74,8 @@ const App = () => {
         setError("No results found.");
       }
     } catch (err: any) {
-      console.error(err);
-      setError("Search failed. Check your connection or backend server.");
+      console.error("Search error:", err);
+      setError("Search failed. Please check your backend or internet connection.");
     } finally {
       setLoading(false);
     }
@@ -122,9 +133,7 @@ const App = () => {
                 <a href={r.link} target="_blank" rel="noopener noreferrer">
                   <h3>{r.title}</h3>
                 </a>
-                {r.publication_info && (
-                  <p>{r.publication_info.summary}</p>
-                )}
+                {r.publication_info && <p>{r.publication_info.summary}</p>}
                 <div className="cite-buttons">
                   <button>Cite in EndNote</button>
                   <button>Cite in Mendeley</button>
