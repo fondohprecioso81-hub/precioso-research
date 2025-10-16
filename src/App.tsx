@@ -45,7 +45,7 @@ const App = () => {
     try {
       const fieldQuery = selectedField !== "All" ? selectedField : "";
 
-      // ✅ Connect to your Express backend
+      // ✅ Connect to your local backend
       const response = await fetch(
         `http://localhost:5000/api/search?q=${encodeURIComponent(
           query + " " + fieldQuery
@@ -64,14 +64,15 @@ const App = () => {
 
       const data = await response.json();
 
-      if (data.error) {
-        throw new Error(data.error);
-      }
+      console.log("📄 Data received:", data); // For debugging in browser console
 
+      // ✅ Adjusted to match SerpAPI response
       if (data.organic_results && data.organic_results.length > 0) {
         setResults(data.organic_results);
+      } else if (data.articles && data.articles.length > 0) {
+        setResults(data.articles);
       } else {
-        setError("No results found.");
+        setError("No results found for this topic.");
       }
     } catch (err: any) {
       console.error("Search error:", err);
@@ -133,7 +134,10 @@ const App = () => {
                 <a href={r.link} target="_blank" rel="noopener noreferrer">
                   <h3>{r.title}</h3>
                 </a>
-                {r.publication_info && <p>{r.publication_info.summary}</p>}
+                {r.snippet && <p>{r.snippet}</p>}
+                {r.publication_info && (
+                  <p>{r.publication_info.summary}</p>
+                )}
                 <div className="cite-buttons">
                   <button>Cite in EndNote</button>
                   <button>Cite in Mendeley</button>

@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// 🔍 Search route (Google Scholar via SerpAPI)
 app.get("/api/search", async (req, res) => {
   const query = req.query.q;
   const apiKey = "da75cf0d72d81ff4f180829866a449d161db3b1816de75715cfc3ab5f638bbef";
@@ -20,14 +21,16 @@ app.get("/api/search", async (req, res) => {
 
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
+    const timeout = setTimeout(() => controller.abort(), 10000); // 10-second timeout
 
     const response = await fetch(
-      `https://serpapi.com/search.json?engine=google_scholar&q=${encodeURIComponent(query)}&api_key=${apiKey}`,
+      `https://serpapi.com/search.json?engine=google_scholar&q=${encodeURIComponent(
+        query
+      )}&api_key=${apiKey}`,
       { signal: controller.signal }
     );
-    clearTimeout(timeout);
 
+    clearTimeout(timeout);
     console.log("➡️ SerpAPI responded with status:", response.status);
 
     if (!response.ok) {
@@ -45,10 +48,17 @@ app.get("/api/search", async (req, res) => {
   }
 });
 
+// 🧩 Example test route
 app.get("/api/message", (req, res) => {
   res.json({ message: "Hello from the Express backend 👋" });
 });
 
+// ⚠️ Handle undefined routes to prevent endless loading
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found" });
+});
+
+// 🚀 Start server
 app.listen(PORT, () => {
   console.log(`✅ Backend running at http://localhost:${PORT}`);
 });
