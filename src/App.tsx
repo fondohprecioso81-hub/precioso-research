@@ -45,9 +45,9 @@ const App = () => {
     try {
       const fieldQuery = selectedField !== "All" ? selectedField : "";
 
-      // ✅ Connect to your local backend
+      // ✅ Connect to your Render backend
       const response = await fetch(
-        `http://localhost:5000/api/search?q=${encodeURIComponent(
+        `https://precioso-research.onrender.com/api/search?q=${encodeURIComponent(
           query + " " + fieldQuery
         )}`,
         {
@@ -63,10 +63,9 @@ const App = () => {
       }
 
       const data = await response.json();
+      console.log("📄 Data received:", data);
 
-      console.log("📄 Data received:", data); // For debugging in browser console
-
-      // ✅ Adjusted to match SerpAPI response
+      // ✅ Adjusted to match SerpAPI or other formats
       if (data.organic_results && data.organic_results.length > 0) {
         setResults(data.organic_results);
       } else if (data.articles && data.articles.length > 0) {
